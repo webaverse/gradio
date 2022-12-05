@@ -188,7 +188,7 @@ def start_server(
             proxyRequest = requests.post("http://127.0.0.1:8080/generate?mode=" + mode + "&map=" + map, data=body_bytes)
             
             # proxy the response content back to the client
-            response = Response(proxyRequest.content)
+            response = Response(proxyRequest.content, headers={'Content-Type':'image/png'})
             response.headers["Access-Control-Allow-Origin"] = "*"
             response.headers["Access-Control-Allow-Headers"] = "*"
             response.headers["Access-Control-Allow-Methods"] = "*"
