@@ -160,10 +160,10 @@ def start_server(
 
     @app.middleware("http")
     async def add_cors_headers(request: Request, call_next):
-        print("server middleware")
+        # print("server middleware")
 
         if (request.method == "OPTIONS"):
-            print("got options 1")
+            # print("got options 1")
             response = Response()
             response.headers["Access-Control-Allow-Origin"] = "*"
             response.headers["Access-Control-Allow-Headers"] = "*"
@@ -172,7 +172,7 @@ def start_server(
             response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
             response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
-            print("got options 2")
+            # print("got options 2")
             return response
 
         # handle /material (ignoring the query string)
@@ -198,7 +198,7 @@ def start_server(
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             return response
 
-        print("got regular")
+        # print("got regular")
         response = await call_next(request)
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "*"
