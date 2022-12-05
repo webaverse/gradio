@@ -17,6 +17,7 @@ import uvicorn
 
 from gradio.routes import App
 from gradio.tunneling import create_tunnel
+from fastapi.middleware.cors import CORSMiddleware
 
 if TYPE_CHECKING:  # Only import for type checking (to avoid circular imports).
     from gradio.blocks import Blocks
@@ -139,6 +140,34 @@ def start_server(
         path_to_local_server = "http://{}:{}/".format(url_host_name, port)
 
     app = App.create_app(blocks)
+
+    # app.add_middleware(
+    #     CORSMiddleware,
+    #     allow_origins=["*"],
+    #     # allow_credentials=True,
+    #     allow_methods=["*"],
+    #     allow_headers=["*"],
+    # )
+
+    # response.headers["Access-Control-Allow-Origin"] = "*"
+    # response.headers["Access-Control-Allow-Headers"] = "*"
+    # response.headers["Access-Control-Allow-Methods"] = "*"
+    # response.headers["Access-Control-Expose-Headers"] = "*"
+    # response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    # response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+    # response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+
+    @app.middleware("http")
+    async def add_cors_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "*"
+        response.headers["Access-Control-Expose-Headers"] = "*"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+        return response
 
     if blocks.save_to is not None:  # Used for selenium tests
         blocks.save_to["port"] = port
