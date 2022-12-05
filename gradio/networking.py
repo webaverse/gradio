@@ -175,6 +175,29 @@ def start_server(
             print("got options 2")
             return response
 
+        # handle /material (ignoring the query string)
+        if request.url.path == "/material":
+            # get body bytes
+            body_bytes = await request.body()
+
+            # get the mode query string
+            mode = request.query_params.get("mode", "seamless") # "seamless", "mirror", "replicate"
+            map = request.query_params.get("map", "n") # "n", "r", "d"
+
+            # post to http://127.0.0.1:8080/generate?mode=seamless&map=n
+            proxyRequest = requests.post("http://127.0.0.1:8080/generate?mode=" + mode + "&map=" + map, data=body_bytes)
+            
+            # proxy the response content back to the client
+            response = Response(proxyRequest.content)
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "*"
+            response.headers["Access-Control-Expose-Headers"] = "*"
+            response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+            response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+            return response
+
         print("got regular")
         response = await call_next(request)
         response.headers["Access-Control-Allow-Origin"] = "*"
